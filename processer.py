@@ -1,6 +1,5 @@
 import sys
 import re
-import json
 from operator import itemgetter
 import helpers
 
@@ -20,13 +19,11 @@ def format_json(data):
         example:
 
         {
-          entries[{'first': 'josh', 'last': 'newman', 'color': 'red', 
-                  'zip': 01234'}],
+          entries[{'firstname': 'josh', 'lastname': 'newman', 'color': 'red', 
+                  'zipcode': 01234', 'phonenumber': '1112223333'}],
          'errors: [1, 4, 5]'
         }
 
-    Raises:
-        IOError: An error occurred accessing the bigtable.Table object.
     """
 
     entries = []
@@ -56,12 +53,10 @@ def sort_json(json_data, keys_to_sort_by):
     Returns:
         The original JSON object with its entries in sorted order
 
-    Raises:
-        IOError: An error occurred accessing the bigtable.Table object.
     """
 
-    json_data['entries'] = sorted(json_data['entries'], key=itemgetter('last', 
-                                                                       'first'))
+    json_data['entries'] = sorted(json_data['entries'], 
+                                  key=itemgetter(*keys_to_sort_by))
     return json_data
 
 def format_user_data(user_data):
@@ -73,13 +68,13 @@ def format_user_data(user_data):
         user_data: a dictionary of user data 
 
     Returns:
-        The user data with phone number in format: 111-222-33333
+        The user data with phone umber in format: 111-222-33333
     """
 
     SEPERATOR = '-'
-    phone = user_data['phone']
+    phone = user_data['phonenumber']
     #Phone number should be in format 999-999-9999
-    user_data['phone'] = SEPERATOR.join([phone[i:i+3] 
+    user_data['phonenumber'] = SEPERATOR.join([phone[i:i+3] 
                        for i in range(0, len(phone)-1, 3)]) + phone[-1]
 
 
@@ -96,8 +91,8 @@ def parse_names(user_data, names):
     Returns:
         The user data dictonary extended with the first and last name
     """
-    user_data['first'] = names[0]
-    user_data['last'] = names[1]
+    user_data['firstname'] = names[0]
+    user_data['lastname'] = names[1]
     return user_data
 
 
@@ -114,12 +109,10 @@ def parse_info(user_data, info):
     Returns:
         The original JSON object with its entries in sorted order
 
-    Raises:
-        IOError: An error occurred accessing the bigtable.Table object.
     """
     regexes = {
-        'phone': r'^\d{10}$',
-        'zip': r'^\d{5}$',
+        'phonenumber': r'^\d{10}$',
+        'zipcode': r'^\d{5}$',
         'color': r'[a-zA-Z]+'
     }
 
@@ -130,7 +123,7 @@ def parse_info(user_data, info):
             if match:
                 user_data[key] = match.group()
 
-    if (all(x in user_data for x in ['phone', 'zip', 'color'])):
+    if (all(x in user_data for x in ['phonenumber', 'zipcode', 'color'])):
         return user_data
     else:
       raise Exception('Invalid Entry')
@@ -156,10 +149,10 @@ def in_first_last_name_order(user_info):
 
 
 def parse_user_data(user_info, user_data={}, NUM_NAME_FIELDS=2):
-    """Handles parsing of user name data and (zip, phone, color) data.
+    """Handles parsing of user name data and (zipcode, phonenumber, color) data.
 
       Takes a list of user information extends an empty user data dictionary
-      with first name, last name, zip code, phone number, color data.
+      with first name, lastname, zipcode, phonenumber, color data.
 
       Args:
           user_info: a list of user data.
@@ -233,16 +226,15 @@ def standardize_entry(entry, NUM_FIELDS=5):
 
     #Check if format is in (First, Last) order
     name_flag = in_first_last_name_order(entry)
-    print(name_flag)
     if (name_flag == False):
-      print(entry, name_flag)
       helpers.swap(0, 1, entry)
     return entry
 
 
-def main(input_filename, output_filename):
+def main(input_filename, output_filename='output.json'):
     NUM_FIELDS = 5
     NUM_NAME_FIELDS = 2
+    SORTING_FIELDS =['lastname', 'firstname']
 
     target_file = open(input_filename, 'r')
     data = []
@@ -258,7 +250,7 @@ def main(input_filename, output_filename):
             data.append('error')
 
     user_json = format_json(data)
-    user_json = sort_json(user_json)
+    user_json = sort_json(user_json, SORTING_FIELDS)
     helpers.output_json(user_json, output_filename)
 
 if __name__ == '__main__':

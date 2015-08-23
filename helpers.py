@@ -1,3 +1,5 @@
+import json
+
 def swap(i, j, arr):
     temp = arr[i]
     arr[i] = arr[j]
@@ -17,8 +19,6 @@ def output_json(json_data, file_name):
     Returns:
         The original JSON object with its entries in sorted order
 
-    Raises:
-        IOError: An error occurred accessing the bigtable.Table object.
     """
 
     with open(file_name, "w") as outfile:

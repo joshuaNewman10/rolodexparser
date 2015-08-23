@@ -1,5 +1,6 @@
 import unittest
 import processer
+import helpers
 
 class TestUM(unittest.TestCase):
 
@@ -10,7 +11,7 @@ class TestUM(unittest.TestCase):
     def test_swap(self):
         entry = ['first', 'last', 'red', '08743', '9999999999']
         swapped_entry = ['last', 'first', 'red', '08743','9999999999']
-        processer.swap(0, 1, entry)
+        helpers.swap(0, 1, entry)
         self.assertEqual(entry, swapped_entry)
 
     def test_standardize_entry(self):
@@ -32,40 +33,41 @@ class TestUM(unittest.TestCase):
         self.assertRaises(processer.handle_capital_names(names), entry)
 
     def test_in_first_last_name_order(self):
-        entry = ['first', 'last', '9999999999', '09832']
-        self.assertEqual(processer.in_first_last_name_order(entry), True)
+        entry = ['first', 'last', '9999999999','red', '09832']
+        self.assertEqual(processer.in_first_last_name_order(entry), False)
 
     def test_parse_info(self):
         entry = ['red', '9999999999', '08743']
         output = {
           'color': 'red',
-          'phone': '9999999999',
-          'zip': '08743'
+          'phonenumber': '9999999999',
+          'zipcode': '08743'
         }
         self.assertEqual(processer.parse_info({}, entry), output)
 
     def test_parse_names(self):
         entry = ['first', 'last']
-        output = {'first': 'first','last': 'last'}
+        output = {'firstname': 'first','lastname': 'last'}
         self.assertEqual(processer.parse_names({}, entry), output)
 
     def test_output_results(self):
         self.assertEqual(1,1)
 
     def test_format_user_data(self):
-        data = {'first': 'first', 'last': 'last', 'zip': '09832', 
-               'phone': '1112223333'}
+        data = {'firstname': 'first', 'lastname': 'last', 'zipcode': '09832', 
+               'phonenumber': '1112223333'}
         formatted_phone = '111-222-3333'
         processer.format_user_data(data)
-        self.assertEqual(data['phone'], formatted_phone)
+        self.assertEqual(data['phonenumber'], formatted_phone)
 
 
     def test_format_json(self):
-        data = [{'first': 'first', 'last': 'last', 'zip': '00011', 
-                'phone': '111-222-3333'}]
+        data = [{'firstname': 'first', 'lastname': 'last', 'zipcode': '00011', 
+                'phonenumber': '111-222-3333'}]
         output = {
-          'entries': [{'first': 'first', 'last': 'last', 'zip': '00011', 
-                'phone': '111-222-3333'}],
+          'entries': [{'firstname': 'first', 'lastname': 'last', 
+                       'zipcode': '00011', 
+                       'phonenumber': '111-222-3333'}],
           'errors': []
         }
         self.assertEqual(processer.format_json(data), output)
