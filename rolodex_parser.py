@@ -231,7 +231,39 @@ def standardize_entry(entry, NUM_FIELDS=5):
     return entry
 
 
-def main(input_filename, output_filename='output.json'):
+def main(input_filename, output_filename):
+    """Parses user data from multiple formats into a JSON object.
+
+    Takes an filename and processes that files' data line by line.
+    Each data entry process is wrapped in a Try, Except block so the program
+    will continue to run if an entry has bad input.
+
+    Args:
+        input_filename: the name of file where the data lives
+        output_filename: the name of the output file where the JSON data will be
+        written. JSON data will be in following format:
+        {
+          errors: [
+            1,
+            4,
+            8
+          ],
+          entries: [
+            {
+              'firstname': 'josh',
+              'lastname: 'newman',
+              'color': 'blue',
+              'zipcode': '08212',
+              'phonenumber':'1112223333'
+            }
+          ]
+        }
+
+    Returns:
+        Undefined.
+        Side effect is a file with JSON data gets created.
+    """
+
     NUM_FIELDS = 5
     NUM_NAME_FIELDS = 2
     SORTING_FIELDS =['lastname', 'firstname']
@@ -239,6 +271,8 @@ def main(input_filename, output_filename='output.json'):
     target_file = open(input_filename, 'r')
     data = []
 
+    #Could use a generator with yield statement after each data entry
+    #to yield control back to another program.
     for line in target_file:
         try:
             user_information = {}
