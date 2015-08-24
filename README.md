@@ -41,7 +41,7 @@
   The RolodexParser module can be used by running the following command 
   from the terminal:
 
-  python rolodex_parser.py input_file_name output.json
+  python rolodex_parser.py data.in output.json
 
   Unit tests can be run via the following command:
 

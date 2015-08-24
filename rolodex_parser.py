@@ -271,7 +271,7 @@ def main(input_filename, output_filename):
     target_file = open(input_filename, 'r')
     data = []
 
-    #Could use a generator with yield statement after each data entry
+    #We Could use a generator with yield statement after each data entry
     #to yield control back to another program.
     for line in target_file:
         try:
